@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="libs/jspdf.umd.min.js"></script>
+<script src="libs/jspdf.plugin.autotable.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Sistema ERP Unificado</title>
+  <style>
+    .logo-container {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1000;
+  text-align: center;
+}
+
+.logo-container a {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-container img {
+  height: 60px;
+  width: auto;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.logo-container img:hover {
+  transform: scale(1.05);
+}
+
+.logo-container span {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #555;
+}
+
+/* 📱 Responsivo para pantallas pequeñas */
+@media (max-width: 600px) {
+  .logo-container {
+    top: 10px;
+    left: 10px;
+  }
+
+  .logo-container img {
+    height: 40px;
+  }
+
+  .logo-container span {
+    font-size: 10px;
+  }
+}
+    body {
+      font-family: Arial;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    nav {
+      background-color: #eee;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    nav button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    nav button:hover {
+      background-color: #0056b3;
+    }
+    section {
+      display: none;
+      padding: 20px;
+    }
+    .activo {
+      display: block;
+    }
+    .logout {
+      background-color: #dc3545;
+    }
+    .logout:hover {
+      background-color: #a71d2a;
+    }
+  </style>
+</head>
+<body>
+    <div class="logo-container">
+  <a href="erp.html">
+    <img src="img/logo.png.png" alt="Logo de la empresa">
+    <span>Inicio</span>
+  </a>
+</div>
+  <header>
+    <h1>🧠 ERP Unificado</h1>
+    <div>
+      <span id="bienvenida"></span>
+      <button class="logout" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <nav>
+    <button onclick="mostrar('inventario')">📦 Inventario</button>
+    <button onclick="mostrar('proveedores')">🧑‍💼 Proveedores</button>
+    <button onclick="mostrar('clientes')">👥 Clientes</button>
+    <button onclick="mostrar('ventas')">💰 Ventas</button>
+    <button onclick="mostrar('dashboard')">📊 Dashboard</button>
+    <button onclick="mostrar('historial')">📜 Historial</button>
+  </nav>
+
+  <main>
+    <section id="inventario"><h2>📦 Gestión de Inventario</h2>
+
+<input type="text" id="busquedaInventario" placeholder="Buscar producto..." onkeyup="filtrarInventario()">
+
+<form id="formInventario">
+  <input type="text" id="nombre" placeholder="Nombre" required>
+  <input type="text" id="categoria" placeholder="Categoría" required>
+  <input type="number" id="cantidad" placeholder="Cantidad" required>
+  <input type="number" id="precio" placeholder="Precio" step="0.01" required>
+  <button type="submit">Guardar</button>
+</form>
+
+<button onclick="exportarInventarioExcel()">📤 Exportar Excel</button>
+<button onclick="exportarInventarioPDF()">🧾 Exportar PDF</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Categoría</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tablaInventario"></tbody>
+</table></section>
+    <section id="proveedores"><h2>🧑‍💼 Gestión de Proveedores</h2>
+
+<input type="text" id="busquedaProveedores" placeholder="Buscar proveedor..." onkeyup="filtrarProveedores()">
+
+<form id="formProveedores">
+  <input type="text" id="provNombre" placeholder="Nombre" required>
+  <input type="text" id="provEmpresa" placeholder="Empresa" required>
+  <input type="text" id="provTelefono" placeholder="Teléfono" required>
+  <input type="email" id="provEmail" placeholder="Email" required>
+  <button type="submit">Guardar</button>
+</form>
+
+<button onclick="exportarProveedoresExcel()">📤 Exportar Excel</button>
+<button onclick="exportarProveedoresPDF()">🧾 Exportar PDF</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Empresa</th>
+      <th>Teléfono</th>
+      <th>Email</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tablaProveedores"></tbody>
+</table>
+</section>
+    <section id="clientes"><h2>👥 Gestión de Clientes</h2>
+
+<input type="text" id="busquedaClientes" placeholder="Buscar cliente..." onkeyup="filtrarClientes()">
+
+<form id="formClientes">
+  <input type="text" id="cliNombre" placeholder="Nombre" required>
+  <input type="text" id="cliRut" placeholder="RUT" required>
+  <input type="text" id="cliDireccion" placeholder="Dirección" required>
+  <input type="text" id="cliTelefono" placeholder="Teléfono" required>
+  <button type="submit">Guardar</button>
+</form>
+
+<button onclick="exportarClientesExcel()">📤 Exportar Excel</button>
+<button onclick="exportarClientesPDF()">🧾 Exportar PDF</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>RUT</th>
+      <th>Dirección</th>
+      <th>Teléfono</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tablaClientes"></tbody>
+</table>
+</section>
+    <section id="ventas"> <h2>💰 Registro de Ventas</h2>
+
+<input type="text" id="busquedaVentas" placeholder="Buscar venta..." onkeyup="filtrarVentas()">
+
+<form id="formVentas">
+  <input type="text" id="ventaProducto" placeholder="Producto" required>
+  <input type="number" id="ventaCantidad" placeholder="Cantidad" required>
+  <input type="text" id="ventaCliente" placeholder="Cliente" required>
+  <input type="date" id="ventaFecha" required>
+  <input type="number" id="ventaTotal" placeholder="Total $" required>
+  <button type="submit">Registrar venta</button>
+</form>
+
+<button onclick="exportarVentasExcel()">📤 Exportar Excel</button>
+<button onclick="exportarVentasPDF()">🧾 Exportar PDF</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Cantidad</th>
+      <th>Cliente</th>
+      <th>Fecha</th>
+      <th>Total</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tablaVentas"></tbody>
+</table>
+<section id="carpetaBoletas">
+  <h2>📁 Carpeta Virtual: Boletas Electrónicas</h2>
+  <table>
+    <thead>
+      <tr><th>N°</th><th>Cliente</th><th>Producto</th><th>Fecha</th><th>Total</th><th>Acciones</th></tr>
+    </thead>
+    <tbody id="tablaCarpetaBoletas"></tbody>
+    <button onclick="exportarCarpetaBoletas()">📦 Exportar carpeta virtual</button>
+
+  </table>
+</section>
+</section>
+    <section id="dashboard"><h2>📊 Dashboard de Ventas</h2>
+<canvas id="graficoVentas" width="400" height="200"></canvas>
+</section>
+    <section id="historial"><h2>📜 Historial de Acciones</h2>
+
+<input type="text" id="busquedaHistorial" placeholder="Buscar en historial..." onkeyup="filtrarHistorial()">
+
+<button onclick="exportarHistorialExcel()">📤 Exportar Excel</button>
+<button onclick="exportarHistorialPDF()">🧾 Exportar PDF</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Tipo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody id="tablaHistorial"></tbody>
+</table>
+ </section>
+  </main>
+
+  <script>
+    // Verifica si hay usuario activo
+    const usuario = sessionStorage.getItem('usuarioActivo');
+    if (!usuario) {
+      window.location.href = "login.html";
+    } else {
+      document.getElementById('bienvenida').textContent = `Bienvenido, ${usuario}`;
+    }
+
+    function mostrar(id) {
+      document.querySelectorAll('section').forEach(s => s.classList.remove('activo'));
+      document.getElementById(id).classList.add('activo');
+    }
+
+    function cerrarSesion() {
+      sessionStorage.removeItem('usuarioActivo');
+      window.location.href = "login.html";
+    }
+  </script>
+  <!-- Toastify -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<!-- SheetJS -->
+<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+  let editandoInventario = null;
+
+  function cargarInventario() {
+    const tabla = document.getElementById('tablaInventario');
+    tabla.innerHTML = '';
+    const productos = JSON.parse(localStorage.getItem('inventario')) || [];
+    productos.forEach((p, i) => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${p.nombre}</td>
+        <td>${p.categoria}</td>
+        <td>${p.cantidad}</td>
+        <td>$${p.precio}</td>
+        <td>
+          <button onclick="editarInventario(${i})">Editar</button>
+          <button onclick="eliminarInventario(${i})">Eliminar</button>
+        </td>
+      `;
+      tabla.appendChild(fila);
+    });
+  }
+
+  document.getElementById('formInventario').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const producto = {
+      nombre: nombre.value,
+      categoria: categoria.value,
+      cantidad: cantidad.value,
+      precio: parseFloat(precio.value).toFixed(2)
+    };
+    let productos = JSON.parse(localStorage.getItem('inventario')) || [];
+
+    if (editandoInventario !== null) {
+      productos[editandoInventario] = producto;
+      registrarAccion('Editar', `Producto: ${producto.nombre}`);
+      editandoInventario = null;
+    } else {
+      productos.push(producto);
+      registrarAccion('Agregar', `Producto: ${producto.nombre}`);
+    }
+
+    localStorage.setItem('inventario', JSON.stringify(productos));
+    this.reset();
+    cargarInventario();
+    Toastify({ text: "Producto guardado", duration: 3000, gravity: "top", position: "right", backgroundColor: "#4CAF50" }).showToast();
+  });
+
+  function editarInventario(i) {
+    const productos = JSON.parse(localStorage.getItem('inventario')) || [];
+    const p = productos[i];
+    nombre.value = p.nombre;
+    categoria.value = p.categoria;
+    cantidad.value = p.cantidad;
+    precio.value = p.precio;
+    editandoInventario = i;
+  }
+
+  function eliminarInventario(i) {
+    let productos = JSON.parse(localStorage.getItem('inventario')) || [];
+    const eliminado = productos[i].nombre;
+    productos.splice(i, 1);
+    localStorage.setItem('inventario', JSON.stringify(productos));
+    cargarInventario();
+    registrarAccion('Eliminar', `Producto: ${eliminado}`);
+    Toastify({ text: "Producto eliminado", duration: 3000, gravity: "top", position: "right", backgroundColor: "#f44336" }).showToast();
+  }
+
+  function filtrarInventario() {
+    const filtro = document.getElementById('busquedaInventario').value.toLowerCase();
+    const filas = document.querySelectorAll('#tablaInventario tr');
+    filas.forEach(fila => {
+      const texto = fila.textContent.toLowerCase();
+      fila.style.display = texto.includes(filtro) ? '' : 'none';
+    });
+  }
+
+  function exportarInventarioExcel() {
+    const tabla = document.getElementById('tablaInventario');
+    const wb = XLSX.utils.table_to_book(tabla, { sheet: "Inventario" });
+    XLSX.writeFile(wb, "inventario.xlsx");
+  }
+
+  function exportarInventarioPDF() {
+    const doc = new jspdf.jsPDF();
+    doc.autoTable({ html: '#tablaInventario' });
+    doc.save('inventario.pdf');
+  }
+
+  function registrarAccion(tipo, detalle) {
+    const historial = JSON.parse(localStorage.getItem('historial')) || [];
+    historial.push({ tipo, detalle, fecha: new Date().toLocaleString() });
+    localStorage.setItem('historial', JSON.stringify(historial));
+  }
+
+  window.addEventListener('DOMContentLoaded', cargarInventario);
+  let editandoProveedor = null;
+
+function cargarProveedores() {
+  const tabla = document.getElementById('tablaProveedores');
+  tabla.innerHTML = '';
+  const proveedores = JSON.parse(localStorage.getItem('proveedores')) || [];
+  proveedores.forEach((p, i) => {
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${p.nombre}</td>
+      <td>${p.empresa}</td>
+      <td>${p.telefono}</td>
+      <td>${p.email}</td>
+      <td>
+        <button onclick="editarProveedor(${i})">Editar</button>
+        <button onclick="eliminarProveedor(${i})">Eliminar</button>
+      </td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+document.getElementById('formProveedores').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const proveedor = {
+    nombre: provNombre.value,
+    empresa: provEmpresa.value,
+    telefono: provTelefono.value,
+    email: provEmail.value
+  };
+  let proveedores = JSON.parse(localStorage.getItem('proveedores')) || [];
+
+  if (editandoProveedor !== null) {
+    proveedores[editandoProveedor] = proveedor;
+    registrarAccion('Editar', `Proveedor: ${proveedor.nombre}`);
+    editandoProveedor = null;
+  } else {
+    proveedores.push(proveedor);
+    registrarAccion('Agregar', `Proveedor: ${proveedor.nombre}`);
+  }
+
+  localStorage.setItem('proveedores', JSON.stringify(proveedores));
+  this.reset();
+  cargarProveedores();
+  Toastify({ text: "Proveedor guardado", duration: 3000, gravity: "top", position: "right", backgroundColor: "#4CAF50" }).showToast();
+});
+
+function editarProveedor(i) {
+  const proveedores = JSON.parse(localStorage.getItem('proveedores')) || [];
+  const p = proveedores[i];
+  provNombre.value = p.nombre;
+  provEmpresa.value = p.empresa;
+  provTelefono.value = p.telefono;
+  provEmail.value = p.email;
+  editandoProveedor = i;
+}
+
+function eliminarProveedor(i) {
+  let proveedores = JSON.parse(localStorage.getItem('proveedores')) || [];
+  const eliminado = proveedores[i].nombre;
+  proveedores.splice(i, 1);
+  localStorage.setItem('proveedores', JSON.stringify(proveedores));
+  cargarProveedores();
+  registrarAccion('Eliminar', `Proveedor: ${eliminado}`);
+  Toastify({ text: "Proveedor eliminado", duration: 3000, gravity: "top", position: "right", backgroundColor: "#f44336" }).showToast();
+}
+
+function filtrarProveedores() {
+  const filtro = document.getElementById('busquedaProveedores').value.toLowerCase();
+  const filas = document.querySelectorAll('#tablaProveedores tr');
+  filas.forEach(fila => {
+    const texto = fila.textContent.toLowerCase();
+    fila.style.display = texto.includes(filtro) ? '' : 'none';
+  });
+}
+
+function exportarProveedoresExcel() {
+  const tabla = document.getElementById('tablaProveedores');
+  const wb = XLSX.utils.table_to_book(tabla, { sheet: "Proveedores" });
+  XLSX.writeFile(wb, "proveedores.xlsx");
+}
+
+function exportarProveedoresPDF() {
+  const doc = new jspdf.jsPDF();
+  doc.autoTable({ html: '#tablaProveedores' });
+  doc.save('proveedores.pdf');
+}
+let editandoCliente = null;
+
+function cargarClientes() {
+  const tabla = document.getElementById('tablaClientes');
+  tabla.innerHTML = '';
+  const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+  clientes.forEach((c, i) => {
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${c.nombre}</td>
+      <td>${c.rut}</td>
+      <td>${c.direccion}</td>
+      <td>${c.telefono}</td>
+      <td>
+        <button onclick="editarCliente(${i})">Editar</button>
+        <button onclick="eliminarCliente(${i})">Eliminar</button>
+      </td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+document.getElementById('formClientes').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const cliente = {
+    nombre: cliNombre.value,
+    rut: cliRut.value,
+    direccion: cliDireccion.value,
+    telefono: cliTelefono.value
+  };
+  let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+
+  if (editandoCliente !== null) {
+    clientes[editandoCliente] = cliente;
+    registrarAccion('Editar', `Cliente: ${cliente.nombre}`);
+    editandoCliente = null;
+  } else {
+    clientes.push(cliente);
+    registrarAccion('Agregar', `Cliente: ${cliente.nombre}`);
+  }
+
+  localStorage.setItem('clientes', JSON.stringify(clientes));
+  this.reset();
+  cargarClientes();
+  Toastify({ text: "Cliente guardado", duration: 3000, gravity: "top", position: "right", backgroundColor: "#4CAF50" }).showToast();
+});
+
+function editarCliente(i) {
+  const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+  const c = clientes[i];
+  cliNombre.value = c.nombre;
+  cliRut.value = c.rut;
+  cliDireccion.value = c.direccion;
+  cliTelefono.value = c.telefono;
+  editandoCliente = i;
+}
+
+function eliminarCliente(i) {
+  let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+  const eliminado = clientes[i].nombre;
+  clientes.splice(i, 1);
+  localStorage.setItem('clientes', JSON.stringify(clientes));
+  cargarClientes();
+  registrarAccion('Eliminar', `Cliente: ${eliminado}`);
+  Toastify({ text: "Cliente eliminado", duration: 3000, gravity: "top", position: "right", backgroundColor: "#f44336" }).showToast();
+}
+
+function filtrarClientes() {
+  const filtro = document.getElementById('busquedaClientes').value.toLowerCase();
+  const filas = document.querySelectorAll('#tablaClientes tr');
+  filas.forEach(fila => {
+    const texto = fila.textContent.toLowerCase();
+    fila.style.display = texto.includes(filtro) ? '' : 'none';
+  });
+}
+
+function exportarClientesExcel() {
+  const tabla = document.getElementById('tablaClientes');
+  const wb = XLSX.utils.table_to_book(tabla, { sheet: "Clientes" });
+  XLSX.writeFile(wb, "clientes.xlsx");
+}
+
+function exportarClientesPDF() {
+  const doc = new jspdf.jsPDF();
+  doc.autoTable({ html: '#tablaClientes' });
+  doc.save('clientes.pdf');
+}
+let editandoVenta = null;
+
+function cargarVentas() {
+  const tabla = document.getElementById('tablaVentas');
+  tabla.innerHTML = '';
+  const ventas = JSON.parse(localStorage.getItem('ventas')) || [];
+  ventas.forEach((v, i) => {
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${v.producto}</td>
+      <td>${v.cantidad}</td>
+      <td>${v.cliente}</td>
+      <td>${v.fecha}</td>
+      <td>$${v.total}</td>
+      <td>
+        <button onclick="editarVenta(${i})">Editar</button>
+        <button onclick="eliminarVenta(${i})">Eliminar</button>
+      </td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+document.getElementById('formVentas').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const venta = {
+    producto: ventaProducto.value,
+    cantidad: ventaCantidad.value,
+    cliente: ventaCliente.value,
+    fecha: ventaFecha.value,
+    total: parseFloat(ventaTotal.value).toFixed(2)
+  };
+
+  let ventas = JSON.parse(localStorage.getItem('ventas')) || [];
+
+  if (editandoVenta !== null) {
+    ventas[editandoVenta] = venta;
+    registrarAccion('Editar', `Venta a ${venta.cliente} - ${venta.producto}`);
+    editandoVenta = null;
+  } else {
+    ventas.push(venta);
+    registrarAccion('Agregar', `Venta a ${venta.cliente} - ${venta.producto}`);
+    generarBoletaPDF(venta);
+    guardarBoletaEnCarpetaVirtual(venta);
+  }
+
+  localStorage.setItem('ventas', JSON.stringify(ventas));
+  this.reset();
+  cargarVentas();
+
+  Toastify({
+    text: "Venta registrada",
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    backgroundColor: "#4CAF50"
+  }).showToast();
+});
+
+function editarVenta(i) {
+  const ventas = JSON.parse(localStorage.getItem('ventas')) || [];
+  const v = ventas[i];
+  ventaProducto.value = v.producto;
+  ventaCantidad.value = v.cantidad;
+  ventaCliente.value = v.cliente;
+  ventaFecha.value = v.fecha;
+  ventaTotal.value = v.total;
+  editandoVenta = i;
+}
+
+function eliminarVenta(i) {
+  let ventas = JSON.parse(localStorage.getItem('ventas')) || [];
+  const eliminado = ventas[i].producto;
+  ventas.splice(i, 1);
+  localStorage.setItem('ventas', JSON.stringify(ventas));
+  cargarVentas();
+  registrarAccion('Eliminar', `Venta eliminada: ${eliminado}`);
+  Toastify({ text: "Venta eliminada", duration: 3000, gravity: "top", position: "right", backgroundColor: "#f44336" }).showToast();
+}
+
+function filtrarVentas() {
+  const filtro = document.getElementById('busquedaVentas').value.toLowerCase();
+  const filas = document.querySelectorAll('#tablaVentas tr');
+  filas.forEach(fila => {
+    const texto = fila.textContent.toLowerCase();
+    fila.style.display = texto.includes(filtro) ? '' : 'none';
+  });
+}
+
+function exportarVentasExcel() {
+  const tabla = document.getElementById('tablaVentas');
+  const wb = XLSX.utils.table_to_book(tabla, { sheet: "Ventas" });
+  XLSX.writeFile(wb, "ventas.xlsx");
+}
+
+function exportarVentasPDF() {
+  const doc = new jspdf.jsPDF();
+  doc.autoTable({ html: '#tablaVentas' });
+  doc.save('ventas.pdf');
+}
+
+function generarFactura(venta) {
+  const factura = {
+    numero: 'F-' + Date.now(),
+    cliente: venta.cliente,
+    producto: venta.producto,
+    cantidad: venta.cantidad,
+    total: venta.total,
+    fecha: venta.fecha
+  };
+  registrarAccion('Factura generada', `Factura ${factura.numero} para ${factura.cliente}`);
+  console.log("Factura generada:", factura);
+}
+function cargarHistorial() {
+  const tabla = document.getElementById('tablaHistorial');
+  tabla.innerHTML = '';
+  const historial = JSON.parse(localStorage.getItem('historial')) || [];
+  historial.forEach(h => {
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${h.fecha}</td>
+      <td>${h.tipo}</td>
+      <td>${h.detalle}</td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+function filtrarHistorial() {
+  const filtro = document.getElementById('busquedaHistorial').value.toLowerCase();
+  const filas = document.querySelectorAll('#tablaHistorial tr');
+  filas.forEach(fila => {
+    const texto = fila.textContent.toLowerCase();
+    fila.style.display = texto.includes(filtro) ? '' : 'none';
+  });
+}
+
+function exportarHistorialExcel() {
+  const tabla = document.getElementById('tablaHistorial');
+  const wb = XLSX.utils.table_to_book(tabla, { sheet: "Historial" });
+  XLSX.writeFile(wb, "historial.xlsx");
+}
+
+function exportarHistorialPDF() {
+  const doc = new jspdf.jsPDF();
+  doc.autoTable({ html: '#tablaHistorial' });
+  doc.save('historial.pdf');
+}
+
+// Cargar historial al mostrar la sección
+document.querySelector('button[onclick="mostrar(\'historial\')"]').addEventListener('click', cargarHistorial);
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function cargarDashboard() {
+  const ventas = JSON.parse(localStorage.getItem('ventas')) || [];
+
+  // Agrupar ventas por mes
+  const ventasPorMes = {};
+  ventas.forEach(v => {
+    const mes = new Date(v.fecha).toLocaleString('default', { month: 'short' });
+    ventasPorMes[mes] = (ventasPorMes[mes] || 0) + parseFloat(v.total);
+  });
+
+  const labels = Object.keys(ventasPorMes);
+  const datos = Object.values(ventasPorMes);
+
+  const ctx = document.getElementById('graficoVentas').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Ventas por mes',
+        data: datos,
+        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+// Cargar el gráfico solo cuando se muestra el dashboard
+document.querySelector('button[onclick="mostrar(\'dashboard\')"]').addEventListener('click', cargarDashboard);
+function generarBoletaPDF(venta) {
+  const doc = new jspdf.jsPDF();
+
+  const img = new Image();
+  img.src ="img/logo.png";
+
+  img.onload = function () {
+    doc.addImage(img, 'PNG', 150, 10, 40, 20);
+
+    doc.setFontSize(16);
+    doc.text("Boleta Electrónica (Simulada)", 20, 20);
+    doc.setFontSize(12);
+    const numeroBoleta = 'F-' + Date.now();
+    doc.text(`N°: ${numeroBoleta}`, 20, 30);
+    doc.text(`Fecha: ${venta.fecha}`, 20, 40);
+    doc.text(`Cliente: ${venta.cliente}`, 20, 50);
+
+    const precioUnitario = (venta.total / venta.cantidad).toFixed(2);
+    const subtotal = (venta.total / 1.19).toFixed(2);
+    const iva = (venta.total - subtotal).toFixed(2);
+
+    doc.autoTable({
+      startY: 60,
+      head: [['Producto', 'Cantidad', 'Precio Unitario', 'Subtotal']],
+      body: [[venta.producto, venta.cantidad, `$${precioUnitario}`, `$${subtotal}`]],
+      theme: 'grid'
+    });
+
+    const finalY = doc.lastAutoTable.finalY;
+    doc.text(`IVA (19%): $${iva}`, 20, finalY + 10);
+    doc.text(`Total: $${venta.total}`, 20, finalY + 20);
+
+    doc.setFontSize(10);
+    doc.text("Esta boleta es una simulación generada por el sistema ERP local.", 20, finalY + 40);
+    doc.text("Gracias por su compra", 20, finalY + 50);
+
+    doc.save(`boleta_${venta.cliente}_${numeroBoleta}.pdf`);
+  };
+}
+function guardarBoletaEnCarpetaVirtual(boleta) {
+  const carpeta = JSON.parse(localStorage.getItem('boletasElectronicas')) || {};
+  carpeta[boleta.numero] = boleta;
+  localStorage.setItem('boletasElectronicas', JSON.stringify(carpeta));
+}
+function cargarCarpetaBoletas() {
+  const tabla = document.getElementById('tablaCarpetaBoletas');
+  tabla.innerHTML = '';
+  const carpeta = JSON.parse(localStorage.getItem('boletasElectronicas')) || {};
+
+  Object.values(carpeta).forEach(b => {
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${b.numero}</td><td>${b.cliente}</td><td>${b.producto}</td>
+      <td>${b.fecha}</td><td>$${b.total}</td>
+      <td><button onclick='generarBoletaPDF(${JSON.stringify(b)})'>Descargar</button></td>
+    `;
+    tabla.appendChild(fila);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', cargarCarpetaBoletas);
+function exportarCarpetaBoletas() {
+  const carpeta = localStorage.getItem('boletasElectronicas');
+  const blob = new Blob([carpeta], { type: 'application/json' });
+  const enlace = document.createElement('a');
+  enlace.href = URL.createObjectURL(blob);
+  enlace.download = 'carpeta_boletas.json';
+  enlace.click();
+}
+
+</script>
+</body>
+</html>
